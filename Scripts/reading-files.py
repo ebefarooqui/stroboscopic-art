@@ -1,8 +1,11 @@
 import rhinoscriptsyntax as rs
+import math
 from os import listdir
 from os.path import isfile, join
 
-input_directory = '/Users/ebefarooqui/Desktop/Stroboscopic-Project/Inputs/Walking Isabel/walking-isabel-AI/'
+
+#input_directory = '/Users/ebefarooqui/Desktop/Stroboscopic-Project/Inputs/Walking Isabel/walking-isabel-AI/'
+input_directory = '/Users/cortensinger/cs294-119/Stroboscopic-Project/Inputs/Walking Isabel/walking-isabel-AI/'
 only_files = [f for f in listdir(input_directory) if isfile(join(input_directory, f))]
 group_count = 0
 groups = []
@@ -60,18 +63,38 @@ def move_group (name, translation):
                 return False
         return True
 
+# Input function that defines the LATERAL movement of each frame
+#
+# Args:
+#   x: Number representing the forward displacement of any time step
+#      that should be matched to the corresponding y-value in this function
+#   total_frames: Number of frames in this zoetrope
+# Returns:
+#   Int: Absolute lateral value to move the current frame
+def F(x, total_frames):
+   # Straight Line
+   #return x
+
+   # Sin Wave
+   return 5 * math.sin(math.pi * 2 * x / total_frames)
+
 def main():
+    num_frames = len(only_files)
+    num_loops = 4
+    step_forward = 3
+    #step_side = 3
+
+    scale_factor = 3
     try:
-       result_name = import_group(only_files[0])
-       result_name1 = import_group(only_files[1])
+	   for i in range(0, num_loops):
+		  for x in range(0, num_frames):
+			 #curr_move_side = step_side * (num_frames * i + (x + 1))
+			 curr_move_forward = step_forward * (num_frames * i + (x + 1))
+			 curr_move_side = F(curr_move_forward, num_frames) 
+			 m = move_group(import_group(only_files[x]), [curr_move_side, 0, curr_move_forward])
+			 if m == False:
+				print("Move Failed")
     except ValueError as err:
-        print(err.args)
-    try:
-        mvd = move_group(result_name, [0,0,15])
-        mvd2 = move_group(result_name1, [0,0,5])
-        if mvd == False or mvd2 == False:
-            print("Move failed")
-    except NameError as err:
         print(err.args)
 
 if __name__ == "__main__":
