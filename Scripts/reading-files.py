@@ -89,7 +89,7 @@ def main():
 	   for i in range(0, num_loops):
 		  for x in range(0, num_frames):
 			 #curr_move_side = step_side * (num_frames * i + (x + 1))
-			 curr_move_forward = step_forward * (num_frames * i + (x + 1))
+			 curr_move_forward = step_forward * ((num_frames - 1) * i + x)
 			 curr_move_side = F(curr_move_forward, num_frames) 
 			 m = move_group(import_group(only_files[x]), [curr_move_side, 0, curr_move_forward])
 			 if m == False:
