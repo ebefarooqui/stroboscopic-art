@@ -73,10 +73,10 @@ def move_group (name, translation):
 #   Int: Absolute lateral value to move the current frame
 def F(x, total_frames):
    # Straight Line
-   #return x
+   return x
 
    # Sin Wave
-   return 5 * math.sin(math.pi * 2 * x / total_frames)
+   #return 5 * math.sin(math.pi * 2 * x / total_frames)
 
 def main():
     num_frames = len(only_files)
