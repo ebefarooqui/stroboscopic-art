@@ -5,7 +5,7 @@ from os.path import isfile, join
 
 
 #input_directory = '/Users/ebefarooqui/Desktop/Stroboscopic-Project/Inputs/Walking Isabel/walking-isabel-AI/'
-input_directory = '/Users/cortensinger/cs294-119/Stroboscopic-Project/Inputs/Walking Isabel/walking-isabel-AI/'
+input_directory = '/Users/cortensinger/cs294-119/Stroboscopic-Project/Inputs/Leaping Wuliang/leaping-wuliang-AI/'
 only_files = [f for f in listdir(input_directory) if isfile(join(input_directory, f))]
 group_count = 0
 groups = []
@@ -76,7 +76,7 @@ def F(x, total_frames):
    return x
 
    # Sin Wave
-   #return 5 * math.sin(math.pi * 2 * x / total_frames)
+   #return 8 * math.sin(math.pi * 2 * x / total_frames)
 
 def main():
     num_frames = len(only_files)
