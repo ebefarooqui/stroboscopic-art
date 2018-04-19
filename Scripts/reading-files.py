@@ -1,11 +1,13 @@
 import rhinoscriptsyntax as rs
 import math
+import csv
 from os import listdir
 from os.path import isfile, join
 
 
-#input_directory = '/Users/ebefarooqui/Desktop/Stroboscopic-Project/Inputs/Walking Isabel/walking-isabel-AI/'
-input_directory = '/Users/cortensinger/cs294-119/Stroboscopic-Project/Inputs/Walking Isabel/walking-isabel-AI/'
+input_directory = '/Users/ebefarooqui/Desktop/Stroboscopic-Project/Inputs/Walking Isabel/walking-isabel-AI/'
+output_directory = '/Users/ebefarooqui/Desktop/'
+#input_directory = '/Users/cortensinger/cs294-119/Stroboscopic-Project/Inputs/Walking Isabel/walking-isabel-AI/'
 only_files = [f for f in listdir(input_directory) if isfile(join(input_directory, f))]
 group_count = 0
 groups = []
@@ -39,7 +41,6 @@ def import_group (filename):
         group_count += 1
         groups.append(name)
         return name
-
 
 # Moves grouped objects to point specified
 # If group doesn't exist, ValueError raised
@@ -78,40 +79,31 @@ def F(x, total_frames):
    # Sin Wave
    #return 5 * math.sin(math.pi * 2 * x / total_frames)
 
+def writeCSV(filename, data):
+    myFile = open(output_directory + filename, 'w')
+    with myFile:
+        writer = csv.writer(myFile)
+        writer.writerows(data)
+
 def main():
     num_frames = len(only_files)
     num_loops = 4
     step_forward = 3
-    #step_side = 3
+    placement_data = []
 
     scale_factor = 3
     try:
-	   for i in range(0, num_loops):
-		  for x in range(0, num_frames):
-			 #curr_move_side = step_side * (num_frames * i + (x + 1))
-			 curr_move_forward = step_forward * ((num_frames - 1) * i + x)
-			 curr_move_side = F(curr_move_forward, num_frames) 
-			 m = move_group(import_group(only_files[x]), [curr_move_side, 0, curr_move_forward])
-			 if m == False:
-				print("Move Failed")
+        for i in range(0, num_loops):
+            for x in range(0, num_frames):
+                curr_move_forward = step_forward * ((num_frames - 1) * i + x)
+                curr_move_side = F(curr_move_forward, num_frames)
+                m = move_group(import_group(only_files[x]), [curr_move_side, 0, curr_move_forward])
+                placement_data.append((curr_move_side, 0, curr_move_forward))
+                if m == False:
+                    print("Move failed")
     except ValueError as err:
         print(err.args)
+    writeCSV('placement.csv',placement_data)
 
 if __name__ == "__main__":
     main()
-
-
-# for f in only_files:
-#     join_string = str(input_directory + f)
-#     combined_string = '!_Import ' + '"' + join_string + '"'
-#     rs.Command(combined_string)
-
-# join_string = str(input_directory + only_files[0])
-# combined_string = '!_Import ' + '"' + join_string + '"'
-# rs.Command(combined_string)
-# objs = rs.AllObjects()
-# name = rs.AddGroup("FirstObject")
-# rs.AddObjectsToGroup(objs, 'FirstObject')
-# guids = rs.ObjectsByGroup('FirstObject')
-# for obj in guids:
-#     rs.MoveObject(obj, [0,0,15])
