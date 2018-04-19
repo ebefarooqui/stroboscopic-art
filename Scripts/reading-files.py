@@ -5,9 +5,13 @@ from os import listdir
 from os.path import isfile, join
 
 
+<<<<<<< HEAD
 input_directory = '/Users/ebefarooqui/Desktop/Stroboscopic-Project/Inputs/Walking Isabel/walking-isabel-AI/'
 output_directory = '/Users/ebefarooqui/Desktop/'
 #input_directory = '/Users/cortensinger/cs294-119/Stroboscopic-Project/Inputs/Walking Isabel/walking-isabel-AI/'
+=======
+#input_directory = '/Users/ebefarooqui/Desktop/Stroboscopic-Project/Inputs/Walking Isabel/walking-isabel-AI/'
+>>>>>>> ae5693dd478301cead4f2941ffdf9fb05b19fee4
 only_files = [f for f in listdir(input_directory) if isfile(join(input_directory, f))]
 group_count = 0
 groups = []
@@ -77,7 +81,7 @@ def F(x, total_frames):
    return x
 
    # Sin Wave
-   #return 5 * math.sin(math.pi * 2 * x / total_frames)
+   #return 8 * math.sin(math.pi * 2 * x / total_frames)
 
 def writeCSV(filename, data):
     myFile = open(output_directory + filename, 'w')
