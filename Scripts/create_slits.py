@@ -16,8 +16,11 @@ def placeSlits(data, width, height):
         rect = rs.AddRectangle(rs.WorldXYPlane(), height, width)
         rs.MoveObject(rect, [data[i][0], data[i][2], 0])
     
-    #export_string = '!_Export ' + '"' + str(output_directory + 'placements') + '"'
-    #rs.Command(export_string)
+    rs.LastCreatedObjects(select=True)
+    # export_string = '!_Export ' + '"' + str(output_directory + 'placements') + '"'
+    # rs.Command(export_string)
+    filename = 'placements.ai'
+    rs.Command("_-Export "+output_directory+filename+" _Enter _Color=RGB _Enter")
 
 
 def main():

@@ -1,4 +1,5 @@
 import rhinoscriptsyntax as rs
+import Rhino
 import math
 import csv
 from os import listdir
@@ -50,14 +51,16 @@ def modify_input (filename):
     
 
     rect = rs.AddRectangle(rs.WorldXYPlane(), abs(maxX - minX), 3.0)
-    rs.MoveObject(rect, [minX, minY - 3.0, minZ])
-    rs.AddPipe(rect,0,0.4)
+    # Move rect up 1/2 of diameter of circle used to pipe
+    # Potentially use solid but smaller in height rect
+    # Select function in rhino module could allow us to select objects so that the export works.
+    rs.MoveObject(rect, [minX, minY - 3.0, minZ + 0.4])
+    piped_rect = rs.AddPipe(rect,0,0.4)
     rs.DeleteObject(closed_curve)
     rs.DeleteObject(rect)
-
-    export_string = '!_Export ' + '"' + str(output_directory + filename) + '"'
-    rs.Command(export_string)
-
+    rs.SelectObjects([piped, piped_rect])
+    
+    rs.Command("_-Export "+output_directory+filename+'.stl'+" _Enter _Tolerance=.001  _Enter")
 
 def readPlacements(filename):
     data = []
@@ -80,8 +83,8 @@ def placeSlits():
     createSlits(locs, 11.18, 3.0)
 
 def main():
-    #modify_input(only_files[0])
-    placeSlits()
+    modify_input(only_files[0])
+    #placeSlits()
 
 
 if __name__ == "__main__":
