@@ -7,8 +7,8 @@ from os.path import isfile, join
 input_directory = '/Users/ebefarooqui/Desktop/Stroboscopic-Project/Inputs/Walking Isabel/walking-isabel-AI/'
 output_directory = '/Users/ebefarooqui/Desktop/Stroboscopic-Project/Output/'
 only_files = [f for f in listdir(input_directory) if isfile(join(input_directory, f))]
-box_width = 11.18
-box_height = 3.0
+box_width = 0
+box_height = 1.5
 pipe_diameter = 0.4
 group_count = 0
 groups = []
@@ -80,6 +80,38 @@ def F (x, total_frames):
    # Sin Wave
    #return 8 * math.sin(math.pi * 2 * x / total_frames)
 
+def calculateWidth (files):
+    
+    global box_width
+    
+    for filename in files:
+        join_string = str(input_directory + filename)
+        combined_string = '!_Import ' + '"' + join_string + '"'
+        rs.Command(combined_string)
+
+        objs = rs.LastCreatedObjects(select=False)[0]
+    
+        bounding_pts = rs.BoundingBox([objs], view_or_plane=rs.WorldXYPlane())
+
+        maxX = 0
+        minX = 0
+        minY = 0
+        minZ = 0
+        for pt in bounding_pts:
+            if pt[0] < minX:
+                minX = pt[0]
+            if pt[0] > maxX:
+                maxX = pt[0]
+            if pt[1] < minY:
+                minY = pt[1]
+            if pt[2] < minZ:
+                minZ = pt[2]
+
+        if abs(maxX - minX) > box_width:
+            box_width = abs(maxX - minX)
+
+        rs.DeleteObject(objs)
+
 # Imports frame from filename, prepares it for 3D printing,
 # and then exports it as an .stl file.
 # 
@@ -128,15 +160,28 @@ def output_frame (filename):
         if pt[2] < minZ:
             minZ = pt[2]
     
+    epsilon = 0.5
+    center = 0
+    one = [center - (box_width / 2) - box_height,minY-epsilon,-1 * pipe_diameter]
+    two = [center - (box_width / 2) - box_height,minY-epsilon,pipe_diameter]
+    three = [center + (box_width / 2) + box_height,minY-epsilon,pipe_diameter]
+    four = [center + (box_width / 2) + box_height,minY-epsilon,-1 * pipe_diameter]
+    five = [center - (box_width / 2) - box_height,minY+epsilon,-1 * pipe_diameter]
+    six = [center - (box_width / 2) - box_height,minY+epsilon,pipe_diameter]
+    seven = [center + (box_width / 2) + box_height,minY+epsilon,pipe_diameter]
+    eight = [center + (box_width / 2) + box_height,minY+epsilon,-1 * pipe_diameter]
+    
+    bowx = rs.AddBox([two, three, four, one, six, seven, eight, five])
 
-    rect = rs.AddRectangle(rs.WorldXYPlane(), abs(maxX - minX), box_height)
+
+    # rect = rs.AddRectangle(rs.WorldXYPlane(), box_width, box_height)
     #rect = rs.AddRectangle(rs.WorldXYPlane(), box_width, box_height)
     # Potentially use solid but smaller in height rect
-    rs.MoveObject(rect, [minX, minY - 3.0, minZ + pipe_diameter])
-    piped_rect = rs.AddPipe(rect,0,pipe_diameter)
+    # rs.MoveObject(rect, [minX, minY - 3.0, minZ + pipe_diameter])
+    # piped_rect = rs.AddPipe(rect,0,pipe_diameter)
     rs.DeleteObject(closed_curve)
-    rs.DeleteObject(rect)
-    rs.SelectObjects([piped, piped_rect])
+    # rs.DeleteObject(rect)
+    rs.SelectObjects([piped, bowx])
     
     rs.Command("_-Export "+output_directory+filename+'.stl'+" _Enter _Tolerance=.001  _Enter")
 
@@ -163,7 +208,9 @@ def place_slits ():
     global output_directory
     
     locs = read_placements(output_directory + 'placement.csv')
-    create_slits(locs, box_width, box_height)
+    print(box_width)
+    # create_slits(locs, box_width * 1.875, box_height * 1.875)
+    create_slits(locs, 38.6, 1.26)
 
 def write_CSV(filename, data):
     global output_directory
@@ -175,10 +222,9 @@ def write_CSV(filename, data):
 def create_frames():
     num_frames = len(only_files)
     num_loops = 4
-    step_forward = 3
+    step_forward = 10
     placement_data = []
 
-    scale_factor = 3
     try:
         for i in range(0, num_loops):
             for x in range(0, num_frames):
@@ -195,6 +241,7 @@ def create_frames():
     rs.DeleteObjects(rs.AllObjects(select=True))
 
 def main():
+    calculateWidth(only_files)
     create_frames()
     place_slits()
 
